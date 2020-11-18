@@ -267,6 +267,8 @@ public class AddDetails extends javax.swing.JFrame {
             pst.setString(7, age.toString());
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registration successful..!!");
+            
+             JOptionPane.showMessageDialog(null, "Registration successful..!!");
            
             txtName.setText("");
             txtF.setText("");

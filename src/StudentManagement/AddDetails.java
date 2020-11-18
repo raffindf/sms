@@ -5,13 +5,14 @@
  */
 package StudentManagement;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.joda.time.*;
+
+
 
 /**
  *
@@ -213,13 +214,14 @@ public class AddDetails extends javax.swing.JFrame {
                 gender="Female";
             }
                     
-                    
+             
             String dob=txtDob.getText();
             String phone=txtPhone.getText();
-             Class.forName("com.mysql.jdbc.Driver");
-            con=DriverManager.getConnection("jdbc:mysql://localhost/studentmanagement","root","");
             
-           
+            LocalDate mydob=new LocalDate(dob);
+            
+           LocalDate now=new LocalDate();
+           Period age=new Period(mydob,now,PeriodType.yearMonthDay());
             
             
             if(txtName.getText().matches(expression)==false){
@@ -246,18 +248,23 @@ public class AddDetails extends javax.swing.JFrame {
                
              else
             {
-
-           
-            pst=con.prepareStatement("insert into details(name,fathername,mothername,gender,dob,phone)values(?,?,?,?,?,?)");
+             Class.forName("com.mysql.jdbc.Driver");
+             con=DriverManager.getConnection("jdbc:mysql://localhost/studentmanagement","root","");    
+            // Statement st=con.createStatement();
             
-           
+             pst=con.prepareStatement("insert into details(name,fathername,mothername,gender,dob,phone,age)values(?,?,?,?,?,?,?)");
+           // String sql="SELECT DATE_FORMAT(FROM_DAYS(DATEDIFF(CURRENT_DATE,dob)),'%y Years %m Months %d Days')as age FROM details";
+                    
+           // ResultSet rs=st.executeQuery(sql);
+           // String age=rs.getString("age");
+            
             pst.setString(1, name);
             pst.setString(2, fathername);
             pst.setString(3, mothername);
             pst.setString(4, gender);
             pst.setString(5,dob);
             pst.setString(6, phone);
-           
+            pst.setString(7, age.toString());
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registration successful..!!");
            
@@ -279,12 +286,10 @@ public class AddDetails extends javax.swing.JFrame {
             
            con.close();
             }
-        } catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(AddDetails.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(AddDetails.class.getName()).log(Level.SEVERE, null, ex);
-        }
-               
+        } 
+           
         
         
     }//GEN-LAST:event_txtSubmitActionPerformed

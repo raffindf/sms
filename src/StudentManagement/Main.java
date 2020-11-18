@@ -13,7 +13,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
+
 
 /**
  *
@@ -133,7 +133,7 @@ public class Main extends javax.swing.JFrame {
              StudentDetails s=new StudentDetails();
              this.hide();
              s.setVisible(true);
-             String sql="SELECT details.rollno,details.name,details.fathername,details.mothername,details.gender,details.dob, details.phone, marks.average,marks.grade  FROM details,marks WHERE marks.rollno=details.rollno";
+             String sql="SELECT details.rollno,details.name,details.fathername,details.mothername,details.gender,details.dob,details.phone, details.age, marks.average,marks.grade  FROM details,marks WHERE marks.rollno=details.rollno";
              ResultSet rs=st.executeQuery(sql);
              
              while(rs.next())
@@ -145,11 +145,13 @@ public class Main extends javax.swing.JFrame {
                  String gender=rs.getString("gender");
                  String dob=rs.getString("dob");
                  String phone=rs.getString("phone");
+                 
                  String average=rs.getString("average");
                  String grade=rs.getString("grade");
+                 String age=rs.getString("age");
                  
                 
-                 String tbData[]={rollno,name,fathername,mothername,gender,dob,phone,average,grade};             
+                 String tbData[]={rollno,name,fathername,mothername,gender,dob,phone,average,grade,age};             
                  //StudentDetails.table1;
                  
                      

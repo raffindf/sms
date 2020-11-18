@@ -10,32 +10,50 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author nadafr
  */
-public class mail extends javax.swing.JFrame {
+public class Mail extends javax.swing.JFrame {
 
     /**
      * Creates new form mail
      */
-    public mail() {
+    public Mail() {
         initComponents();
     }
-
+Connection con;
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -93,92 +111,109 @@ public class mail extends javax.swing.JFrame {
     private void txtSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSendActionPerformed
         // TODO add your handling code here:
         
+        
          Properties props=new Properties();
          props.put("mail.smtp.host","smtp.gmail.com");
-         props.put("mail.smtp.port", 465);
+         props.put("mail.smtp.port", "465");
          props.put("mail.smtp.user", "raffinadaf55@gmail.com");
          props.put("mail.smtp.auth", "true");
          props.put("mail.smtp.starttls.enable", "true");
          props.put("mail.smtp.debug", "true");
-         props.put("mail.smtp.socketFactory.port", 465);
+         props.put("mail.smtp.socketFactory.port", "465");
          props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
          props.put("mail.smtp.socketFactory.fallback", "false");
          
-         // String path="";
-        //JFileChooser j=new JFileChooser();
-        //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        //int x=j.showSaveDialog(this);
-        
-       // if(x==JFileChooser.APPROVE_OPTION)
-       // {
-          //  path=j.getSelectedFile().getPath();
-   // }                                        
-    Document doc=new Document();
-    
-        try {
-            PdfWriter.getInstance(doc, new FileOutputStream("details.pdf"));
-            doc.open();
-           PdfPTable tb1=new PdfPTable(9);
-           tb1.addCell("Roll no");
-           tb1.addCell("Name");
-           tb1.addCell("Father's name");
-           tb1.addCell("Mother's name");
-           tb1.addCell("Gender");
-           tb1.addCell("DOB");
-           tb1.addCell("Phone");
-           tb1.addCell("Average");
-           tb1.addCell("Grade");
-           
-           for(int i=0;i<table1.getRowCount();i++)
-           {
-              String rollno=table1.getValueAt(i,0).toString();
-              String name=table1.getValueAt(i,1).toString();
-              String fathername=table1.getValueAt(i,2).toString();
-              String mothername=table1.getValueAt(i,3).toString();
-              String gender=table1.getValueAt(i,4).toString();
-              String dob=table1.getValueAt(i,5).toString();
-              String phone=table1.getValueAt(i,6).toString();
-              String average=table1.getValueAt(i,7).toString();
-              String grade=table1.getValueAt(i,8).toString();
-              
-              tb1.addCell(rollno);
-              tb1.addCell(name);
-              tb1.addCell(fathername);
-              tb1.addCell(mothername);
-              tb1.addCell(gender);
-              tb1.addCell(dob);
-              tb1.addCell(phone);
-              tb1.addCell(average);
-              tb1.addCell(grade);
-              
-              doc.add(tb1);
-              
-              
-           }
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(StudentDetails.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DocumentException ex) {
-            Logger.getLogger(StudentDetails.class.getName()).log(Level.SEVERE, null, ex);
-        }
+                                     
+  
         
         Session session=Session.getDefaultInstance(props,null);
         session.setDebug(true);
         MimeMessage message=new MimeMessage(session);
         try {
-            
+            message.setText("");
+            message.setSubject("Student details");
             message.setFrom(new InternetAddress("raffinadaf555@gmil.com"));
              message.addRecipient(RecipientType.TO, new InternetAddress(txtMail.getText().trim()));
-             message.saveChanges();
+             
+             
+             BodyPart messageBodyPart1=new MimeBodyPart();
+             messageBodyPart1.setText("Body");
+             MimeBodyPart messageBodyPart2=new MimeBodyPart();
+             
+              String csvFilePath = "Details.csv";
+         
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/studentmanagement","root","")) {
+            String sql = "SELECT details.rollno,details.name,details.fathername,details.mothername,details.gender, details.phone,details.age, marks.average,marks.grade  FROM details,marks WHERE marks.rollno=details.rollno";
+
+             
+            Statement statement = connection.createStatement();
+             
+            ResultSet result = statement.executeQuery(sql);
+             
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(csvFilePath));
+             
+            // write header line containing column names       
+            fileWriter.write("rollno,name,fathername,mothername,gender,phone,average,grade,age");
+             
+            while (result.next()) {
+                int Rollno = result.getInt("rollno");
+                String Name = result.getString("name");
+                String FatherName = result.getString("fathername");
+                String MotherName = result.getString("mothername");
+                String gender = result.getString("gender");
+                Date dob = result.getDate("dob");
+                String phone = result.getString("phone");
+                float average = result.getFloat("average");
+                 String grade = result.getString("grade");
+                 String age = result.getString("age");
+               
+               
+                 
+               
+                 
+                String line = String.format("%d,\"%s\",%s,%s,%s,%s,%s,%f,%s,%s",
+                       Rollno , Name, FatherName, MotherName,gender,dob,phone,average,grade,age);
+                 
+                fileWriter.newLine();
+                fileWriter.write(line);            
+            }
+             
+            statement.close();
+            fileWriter.close();
+             
+             
+        } catch (SQLException e) {
+            System.out.println("Datababse error:");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("File IO error:");
+            e.printStackTrace();
+        }
+        
+             
+             
+             
+             
+             
+             DataSource source=new FileDataSource(csvFilePath);
+             messageBodyPart2.setDataHandler(new DataHandler(source));
+             messageBodyPart2.setFileName(csvFilePath);
+             Multipart multipart=new MimeMultipart();
+             multipart.addBodyPart(messageBodyPart1);
+              multipart.addBodyPart(messageBodyPart2);
+              message.setContent(multipart);
+             
+             
+            // message.saveChanges();
              Transport transport=session.getTransport("smtp");
-             transport.connect("smtp.gmail.com","raffinadaf555@gmail.com","Raffi@555");
+             transport.connect("smtp.gmail.com","raffinadaf555@gmail.com","Raffi555");
              transport.sendMessage(message,message.getAllRecipients());
              transport.close();
              JOptionPane.showMessageDialog(this,"Mail sent successfully");
-            
-        } catch (MessagingException ex) {
-            Logger.getLogger(mail.class.getName()).log(Level.SEVERE, null, ex);
-        }
+             }
+         catch (MessagingException ex) {
+            Logger.getLogger(Mail.class.getName()).log(Level.SEVERE, null, ex);
+        } 
        
         
     
@@ -202,20 +237,21 @@ public class mail extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Mail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new mail().setVisible(true);
+                new Mail().setVisible(true);
             }
         });
     }

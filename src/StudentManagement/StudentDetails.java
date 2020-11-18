@@ -5,24 +5,11 @@
  */
 package StudentManagement;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.swing.JFileChooser;
+import java.io.*;
+import java.sql.*;
+
+import javax.swing.JOptionPane;
+import java.util.Date;
 
 
 
@@ -30,10 +17,18 @@ public class StudentDetails extends javax.swing.JFrame {
     
     public StudentDetails() {
         initComponents();
+      
         
     }
      Connection con;
     PreparedStatement pst;
+    
+  //  public void myInitComponents(){
+       // jButton2.addActionListener(new java.awt.event.ActionListener() {
+       //  /   public void actionPerformed(java.awt.event.ActionEvent evt) {
+        //        jButton2ActionPerformed(evt);
+   //         }
+   // }
  
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -44,7 +39,7 @@ public class StudentDetails extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         table1 = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,7 +71,7 @@ public class StudentDetails extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Roll no", "Name", "Father's Name", "Mother's name", "Gender", "DOB", "Phone", "Average", "Grade"
+                "Roll no", "Name", "Father's Name", "Mother's name", "Gender", "DOB", "Phone", "Average", "Grade", "Age"
             }
         ));
         jScrollPane1.setViewportView(table1);
@@ -88,7 +83,7 @@ public class StudentDetails extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("jButton3");
+        jButton2.setText("Send via mail");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -98,12 +93,10 @@ public class StudentDetails extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(268, 268, 268)
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton3)
-                .addGap(273, 273, 273))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1)
-                .addGap(102, 102, 102))
+                .addGap(92, 92, 92)
+                .addComponent(jButton2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -115,9 +108,15 @@ public class StudentDetails extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton3))
+                    .addComponent(jButton2))
                 .addGap(71, 71, 71))
         );
+
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         pack();
         setLocationRelativeTo(null);
@@ -125,79 +124,79 @@ public class StudentDetails extends javax.swing.JFrame {
 
     
     
-     
+      private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+      Mail a=new Mail();
+      this.hide();
+      a.setVisible(true);
+      }   
     
-    
+      
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        
-        String path="";
-        JFileChooser j=new JFileChooser();
-        j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int x=j.showSaveDialog(this);
         
-        if(x==JFileChooser.APPROVE_OPTION)
-        {
-            path=j.getSelectedFile().getPath();
-    }//GEN-LAST:event_jButton1ActionPerformed
-          Document doc=new Document();
-    
-           try {
-            PdfWriter.getInstance(doc, new FileOutputStream(path+"details.pdf"));
-            doc.open();
-           PdfPTable tb1=new PdfPTable(9);
-           tb1.addCell("Roll no");
-           tb1.addCell("Name");
-           tb1.addCell("Father's name");
-           tb1.addCell("Mother's name");
-           tb1.addCell("Gender");
-           tb1.addCell("DOB");
-           tb1.addCell("Phone");
-           tb1.addCell("Average");
-           tb1.addCell("Grade");
-           
-           for(int i=0;i<table1.getRowCount();i++)
-           {
-              String rollno=table1.getValueAt(i,0).toString();
-              String name=table1.getValueAt(i,1).toString();
-              String fathername=table1.getValueAt(i,2).toString();
-              String mothername=table1.getValueAt(i,3).toString();
-              String gender=table1.getValueAt(i,4).toString();
-              String dob=table1.getValueAt(i,5).toString();
-              String phone=table1.getValueAt(i,6).toString();
-              String average=table1.getValueAt(i,7).toString();
-              String grade=table1.getValueAt(i,8).toString();
-              
-              tb1.addCell(rollno);
-              tb1.addCell(name);
-              tb1.addCell(fathername);
-              tb1.addCell(mothername);
-              tb1.addCell(gender);
-              tb1.addCell(dob);
-              tb1.addCell(phone);
-              tb1.addCell(average);
-              tb1.addCell(grade);
-              
-              doc.add(tb1);
-              
-              
-           }
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(StudentDetails.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DocumentException ex) {
-            Logger.getLogger(StudentDetails.class.getName()).log(Level.SEVERE, null, ex);
+        String csvFilePath = "Details.csv";
+         
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/studentmanagement","root","")) {
+            String sql = "SELECT details.rollno,details.name,details.fathername,details.mothername,details.gender, details.dob, details.phone,details.age, marks.average,marks.grade  FROM details,marks WHERE marks.rollno=details.rollno";
+
+             
+            Statement statement = connection.createStatement();
+             
+            ResultSet result = statement.executeQuery(sql);
+             
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(csvFilePath));
+             
+            // write header line containing column names       
+            fileWriter.write("rollno,name,fathername,mothername,gender,dob,phone,age,average,grade");
+             
+            while (result.next()) {
+                int Rollno = result.getInt("rollno");
+                String Name = result.getString("name");
+                String FatherName = result.getString("fathername");
+                String MotherName = result.getString("mothername");
+                String gender = result.getString("gender");
+               //
+               // SimpleDateFormat datefor=new SimpleDateFormat("yyyy-MM-dd");
+                 Date dob=result.getDate("dob");
+               // String dob1=datefor.format(result.getString("dob"));
+               
+              // String dobb= result.getString("dob");
+               
+                String phone = result.getString("phone");
+                float average = result.getFloat("average");
+               
+                String grade = result.getString("grade");
+                 String age = result.getString("age");
+                 
+               
+                 
+                String line = String.format("%d,\"%s\",%s,%s,%s,%s,%s,%f,%s,%s",
+                       Rollno , Name, FatherName, MotherName,gender,dob,phone,average,grade,age);
+                 
+                fileWriter.newLine();
+                fileWriter.write(line);            
+            }
+             
+            statement.close();
+            fileWriter.close();
+             JOptionPane.showMessageDialog(null,"Downloading completed...");
+             
+        } catch (SQLException e) {
+            System.out.println("Datababse error:");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("File IO error:");
+            e.printStackTrace();
         }
         
-        doc.close();
+           
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     
-    }
     
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-       mail m=new mail();
-       this.hide();
-       m.setVisible(true);
-    } 
+    
+    
     public static void main(String args[]) {
        
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -209,7 +208,7 @@ public class StudentDetails extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     public javax.swing.JScrollPane jScrollPane1;
